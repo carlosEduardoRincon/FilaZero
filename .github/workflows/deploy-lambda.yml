@@ -17,9 +17,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-
-      - name: Build (Maven)
-        run: mvn -B -DskipTests clean package
+          cache: maven
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,6 +26,9 @@ jobs:
 
       - name: Install AWS SAM CLI
         run: pip install aws-sam-cli
+
+      - name: SAM Build
+        run: sam build --template-file template.yaml
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -39,7 +40,7 @@ jobs:
       - name: SAM Deploy
         run: |
           sam deploy \
-            --template-file template.yaml \
+            --template-file .aws-sam/build/template.yaml \
             --stack-name filazero-mvp \
             --region us-east-1 \
             --capabilities CAPABILITY_IAM \
