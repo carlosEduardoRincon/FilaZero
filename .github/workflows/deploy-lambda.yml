@@ -24,11 +24,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Build shaded JAR (Maven)
+        run: mvn -B -DskipTests clean package
+
       - name: Install AWS SAM CLI
         run: pip install aws-sam-cli
-
-      - name: SAM Build
-        run: sam build --template-file template.yaml
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -40,7 +40,7 @@ jobs:
       - name: SAM Deploy
         run: |
           sam deploy \
-            --template-file .aws-sam/build/template.yaml \
+            --template-file template.yaml \
             --stack-name filazero-mvp \
             --region us-east-1 \
             --capabilities CAPABILITY_IAM \

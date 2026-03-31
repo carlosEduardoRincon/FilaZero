@@ -62,11 +62,9 @@ Resources:
 
   FilaZeroApiFunction:
     Type: AWS::Serverless::Function
-    Metadata:
-      BuildMethod: maven
     Properties:
       FunctionName: filazero-api-mvp
-      CodeUri: .
+      CodeUri: target/filazero-api-0.0.1-SNAPSHOT.jar
       Handler: br.com.filazero.StreamLambdaHandler::handleRequest
       Environment:
         Variables:
