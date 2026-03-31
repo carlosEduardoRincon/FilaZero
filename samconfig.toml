@@ -1,0 +1,12 @@
+version = 0.1
+
+[default]
+[default.build]
+cached = true
+parallel = true
+
+[default.deploy]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+

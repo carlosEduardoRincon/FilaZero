@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: FilaZero API (MVP) - Spring Boot on AWS Lambda
+
+Globals:
+  Function:
+    Runtime: java21
+    MemorySize: 1024
+    Timeout: 30
+    Tracing: Active
+
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+
+  PatientsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: filazero-patients
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: patientId
+          AttributeType: S
+        - AttributeName: cpfHash
+          AttributeType: S
+      KeySchema:
+        - AttributeName: patientId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: byCpfHash
+          KeySchema:
+            - AttributeName: cpfHash
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  TriagesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: filazero-triages
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: triageId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: triageId
+          KeyType: HASH
+
+  QueueTicketsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: filazero-queue-tickets
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: ticketId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ticketId
+          KeyType: HASH
+
+  FilaZeroApiFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: maven
+    Properties:
+      FunctionName: filazero-api-mvp
+      CodeUri: .
+      Handler: br.com.filazero.StreamLambdaHandler::handleRequest
+      Environment:
+        Variables:
+          PATIENTS_TABLE: !Ref PatientsTable
+          TRIAGES_TABLE: !Ref TriagesTable
+          QUEUE_TICKETS_TABLE: !Ref QueueTicketsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PatientsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TriagesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref QueueTicketsTable
+      Events:
+        ProxyApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /{proxy+}
+            Method: ANY
+        RootApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /
+            Method: ANY
+
+Outputs:
+  ApiUrl:
+    Description: Base URL for HttpApi
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+

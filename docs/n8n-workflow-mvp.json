@@ -1,0 +1,769 @@
+{
+  "name": "FilaZero MVP - WhatsApp Triagem e Fila",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "filazero-whatsapp-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook_in",
+      "name": "Webhook In",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "phone",
+              "value": "={{ $json.body.phone || $json.phone || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "text",
+              "value": "={{ ($json.body.text || $json.text || \"\").toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "sessionState",
+              "value": "={{ $json.body.sessionState || $json.sessionState || \"START\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "cpf",
+              "value": "={{ $json.body.cpf || $json.cpf || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "birthDate",
+              "value": "={{ $json.body.birthDate || $json.birthDate || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "unitId",
+              "value": "={{ $json.body.unitId || $json.unitId || \"upa-centro\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a7",
+              "name": "alarm",
+              "value": "={{ $json.body.alarm || $json.alarm || false }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "normalize_input",
+      "name": "Normalizar Entrada",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.sessionState }}",
+                    "rightValue": "START",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "s1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.sessionState }}",
+                    "rightValue": "PATIENT_IDENTIFIED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "s2"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.sessionState }}",
+                    "rightValue": "TRIAGED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "s3"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.sessionState }}",
+                    "rightValue": "TICKET_CREATED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "s4"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "switch_state",
+      "name": "Switch Estado da Sessao",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "i1",
+              "name": "message",
+              "value": "Para iniciar, envie CPF, data de nascimento (AAAA-MM-DD) e se possui sinal de alarme (sim/nao).",
+              "type": "string"
+            },
+            {
+              "id": "i2",
+              "name": "nextSessionState",
+              "value": "PATIENT_IDENTIFIED",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ask_initial_data",
+      "name": "Solicitar Dados Iniciais",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        980,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.FILAZERO_API_BASE_URL + '/api/patients/identify-or-create' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"phone\": \"{{ $json.phone }}\", \"cpf\": \"{{ $json.cpf }}\", \"birthDate\": \"{{ $json.birthDate }}\" }",
+        "options": {}
+      },
+      "id": "api_identify_patient",
+      "name": "API Identificar Paciente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        980,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.FILAZERO_API_BASE_URL + '/api/triages/evaluate' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"patientId\": \"{{ $json.patientId }}\", \"answers\": { \"alarm\": {{ $json.alarm }}, \"symptomDescription\": \"{{ $json.text }}\" } }",
+        "options": {}
+      },
+      "id": "api_evaluate_triage",
+      "name": "API Avaliar Triagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "t1",
+              "name": "message",
+              "value": "={{ 'Triagem concluida. Risco: ' + $json.risk + '. Recomendacao: ' + $json.recommendation + '. Deseja entrar na fila? (sim/nao)' }}",
+              "type": "string"
+            },
+            {
+              "id": "t2",
+              "name": "triageId",
+              "value": "={{ $json.triageId }}",
+              "type": "string"
+            },
+            {
+              "id": "t3",
+              "name": "nextSessionState",
+              "value": "TRIAGED",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format_triage_response",
+      "name": "Montar Resposta Triagem",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1460,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "q1",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "sim",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_wants_queue",
+      "name": "IF Quer Entrar na Fila",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.FILAZERO_API_BASE_URL + '/api/queue/tickets' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"triageId\": \"{{ $json.triageId }}\", \"unitId\": \"{{ $json.unitId }}\" }",
+        "options": {}
+      },
+      "id": "api_create_ticket",
+      "name": "API Criar Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "tk1",
+              "name": "message",
+              "value": "={{ 'Ticket criado: ' + $json.ticketId + '. Janela: ' + $json.windowStart + ' ate ' + $json.windowEnd + '. Quando chegar, responda: cheguei.' }}",
+              "type": "string"
+            },
+            {
+              "id": "tk2",
+              "name": "ticketId",
+              "value": "={{ $json.ticketId }}",
+              "type": "string"
+            },
+            {
+              "id": "tk3",
+              "name": "nextSessionState",
+              "value": "TICKET_CREATED",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format_ticket_response",
+      "name": "Montar Resposta Ticket",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1460,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "nq1",
+              "name": "message",
+              "value": "Sem problema. Se os sintomas piorarem, procure uma UPA imediatamente.",
+              "type": "string"
+            },
+            {
+              "id": "nq2",
+              "name": "nextSessionState",
+              "value": "START",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "queue_declined_response",
+      "name": "Resposta Sem Fila",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1220,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "cheguei",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_checkin_text",
+      "name": "IF Paciente Chegou",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.FILAZERO_API_BASE_URL + '/api/queue/tickets/' + $json.ticketId + '/checkin' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api_checkin_ticket",
+      "name": "API Check-in Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ci1",
+              "name": "message",
+              "value": "Check-in confirmado. Aguarde ser chamado pela equipe.",
+              "type": "string"
+            },
+            {
+              "id": "ci2",
+              "name": "nextSessionState",
+              "value": "START",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format_checkin_response",
+      "name": "Montar Resposta Check-in",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1460,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ci3",
+              "name": "message",
+              "value": "Para confirmar chegada, responda exatamente: cheguei",
+              "type": "string"
+            },
+            {
+              "id": "ci4",
+              "name": "nextSessionState",
+              "value": "TICKET_CREATED",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "checkin_help_response",
+      "name": "Ajuda Check-in",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1220,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"message\": $json.message, \"sessionState\": $json.nextSessionState, \"patientId\": $json.patientId, \"triageId\": $json.triageId, \"ticketId\": $json.ticketId }",
+        "options": {}
+      },
+      "id": "webhook_response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1760,
+        460
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook In": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Entrada": {
+      "main": [
+        [
+          {
+            "node": "Switch Estado da Sessao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Estado da Sessao": {
+      "main": [
+        [
+          {
+            "node": "Solicitar Dados Iniciais",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API Identificar Paciente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Quer Entrar na Fila",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Paciente Chegou",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solicitar Dados Iniciais": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Identificar Paciente": {
+      "main": [
+        [
+          {
+            "node": "API Avaliar Triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Avaliar Triagem": {
+      "main": [
+        [
+          {
+            "node": "Montar Resposta Triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Resposta Triagem": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Quer Entrar na Fila": {
+      "main": [
+        [
+          {
+            "node": "API Criar Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resposta Sem Fila",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Criar Ticket": {
+      "main": [
+        [
+          {
+            "node": "Montar Resposta Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Resposta Ticket": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resposta Sem Fila": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Paciente Chegou": {
+      "main": [
+        [
+          {
+            "node": "API Check-in Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ajuda Check-in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Check-in Ticket": {
+      "main": [
+        [
+          {
+            "node": "Montar Resposta Check-in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Resposta Check-in": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajuda Check-in": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {}
+}
+
