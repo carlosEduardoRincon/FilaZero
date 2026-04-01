@@ -30,7 +30,8 @@ public class TriageService {
         boolean symptomTextAlarm = symptomAlertAnalyzer.hasAlertSignal(evaluateTriageRequest.symptomDescription());
         boolean isUrgent = explicitAlarm || symptomTextAlarm;
 
-        String risk = isUrgent ? "RED" : "GREEN";
+        // Vermelho (imediato), Amarelo (urgente), Verde (pouco urgente) e Azul (não urgente).
+        String risk = isUrgent ? "Vermelho(imediato)" : "Verde(pouco urgente)";
         String unitTypeSuggested = isUrgent ? "UPA" : "UBS";
         String recommendation =
                 isUrgent
