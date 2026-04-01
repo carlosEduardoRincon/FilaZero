@@ -35,8 +35,8 @@ public class TriageService {
         String unitTypeSuggested = isUrgent ? "UPA" : "UBS";
         String recommendation =
                 isUrgent
-                        ? "Procure uma UPA imediatamente ou ligue 192 se necessário."
-                        : "Procure uma UBS para avaliação e acompanhamento.";
+                        ? "Procure uma UPA imediatamente ou ligue 192"
+                        : "Procure uma UBS para avaliação e acompanhamento";
 
         Triage triage = new Triage();
         triage.setTriageId(UUID.randomUUID().toString());
