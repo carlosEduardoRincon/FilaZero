@@ -2,6 +2,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: FilaZero API (MVP) - Spring Boot on AWS Lambda
 
+Parameters:
+  ApiStageName:
+    Type: String
+    Default: prod
+    Description: HTTP API stage (first URL segment). Must match server.servlet.context-path in Lambda.
+
 Globals:
   Function:
     Runtime: java21
@@ -13,7 +19,7 @@ Resources:
   HttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      StageName: prod
+      StageName: !Ref ApiStageName
 
   PatientsTable:
     Type: AWS::DynamoDB::Table
@@ -71,6 +77,8 @@ Resources:
           PATIENTS_TABLE: !Ref PatientsTable
           TRIAGES_TABLE: !Ref TriagesTable
           QUEUE_TICKETS_TABLE: !Ref QueueTicketsTable
+          # Http API sends paths like /prod/api/...; Spring maps controllers under /api/...
+          SERVER_SERVLET_CONTEXT_PATH: !Sub "/${ApiStageName}"
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PatientsTable
@@ -95,5 +103,5 @@ Resources:
 Outputs:
   ApiUrl:
     Description: Base URL for HttpApi
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}/"
 
