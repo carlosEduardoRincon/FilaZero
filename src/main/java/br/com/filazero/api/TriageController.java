@@ -21,7 +21,7 @@ public class TriageController {
 
     @PostMapping(value = "/evaluate", produces = MediaType.APPLICATION_JSON_VALUE)
     public EvaluateTriageResponse evaluate(@Valid @RequestBody EvaluateTriageRequest request) {
-        var triage = service.evaluate(request.patientId(), request.answers());
+        var triage = service.evaluate(request);
         return new EvaluateTriageResponse(
                 triage.getTriageId(), triage.getRisk(), triage.getRecommendation(), triage.getUnitTypeSuggested());
     }

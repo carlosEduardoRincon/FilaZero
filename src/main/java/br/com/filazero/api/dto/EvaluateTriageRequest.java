@@ -6,6 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 
 public record EvaluateTriageRequest(
-        @NotBlank String patientId, @NotNull Map<String, Object> answers) {
+        @NotBlank String patientId, @NotNull Boolean isUrgent, @NotBlank String symptomDescription) {
 }
 

@@ -1,5 +1,6 @@
 package br.com.filazero.service;
 
+import br.com.filazero.api.dto.EvaluateTriageRequest;
 import br.com.filazero.domain.Triage;
 import br.com.filazero.repo.TriageRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,49 +25,34 @@ public class TriageService {
         this.symptomAlertAnalyzer = symptomAlertAnalyzer;
     }
 
-    public Triage evaluate(String patientId, Map<String, Object> answers) {
-        boolean explicitAlarm =
-                Boolean.TRUE.equals(answers.get("alarm"))
-                        || Boolean.TRUE.equals(answers.get("sinais_alarme"))
-                        || Boolean.TRUE.equals(answers.get("red_flags"));
-        String symptomDescription = extractSymptomDescription(answers);
-        boolean symptomTextAlarm = symptomAlertAnalyzer.hasAlertSignal(symptomDescription);
-        boolean alarm = explicitAlarm || symptomTextAlarm;
+    public Triage evaluate(EvaluateTriageRequest evaluateTriageRequest) {
+        boolean explicitAlarm = Boolean.TRUE.equals(evaluateTriageRequest.isUrgent());
+        boolean symptomTextAlarm = symptomAlertAnalyzer.hasAlertSignal(evaluateTriageRequest.symptomDescription());
+        boolean isUrgent = explicitAlarm || symptomTextAlarm;
 
-        String risk = alarm ? "RED" : "GREEN";
-        String unitTypeSuggested = alarm ? "UPA" : "UBS";
+        String risk = isUrgent ? "RED" : "GREEN";
+        String unitTypeSuggested = isUrgent ? "UPA" : "UBS";
         String recommendation =
-                alarm
+                isUrgent
                         ? "Procure uma UPA imediatamente ou ligue 192 se necessário."
                         : "Procure uma UBS para avaliação e acompanhamento.";
 
         Triage triage = new Triage();
         triage.setTriageId(UUID.randomUUID().toString());
-        triage.setPatientId(patientId);
+        triage.setPatientId(evaluateTriageRequest.patientId());
         triage.setRisk(risk);
         triage.setUnitTypeSuggested(unitTypeSuggested);
         triage.setRecommendation(recommendation);
         triage.setCreatedAt(Instant.now());
-        triage.setRawAnswersJson(toJson(answers));
+        triage.setRawAnswersJson(toJson(evaluateTriageRequest));
 
         repo.put(triage);
         return triage;
     }
 
-    private String extractSymptomDescription(Map<String, Object> answers) {
-        Object value = answers.get("symptomDescription");
-        if (value == null) {
-            value = answers.get("descricao_sintomas");
-        }
-        if (value == null) {
-            value = answers.get("queixa");
-        }
-        return value == null ? "" : String.valueOf(value);
-    }
-
-    private String toJson(Map<String, Object> answers) {
+    private String toJson(Object object) {
         try {
-            return objectMapper.writeValueAsString(answers);
+            return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             return "{}";
         }
