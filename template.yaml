@@ -71,7 +71,7 @@ Resources:
           PATIENTS_TABLE: !Ref PatientsTable
           TRIAGES_TABLE: !Ref TriagesTable
           QUEUE_TICKETS_TABLE: !Ref QueueTicketsTable
-          SERVER_SERVLET_CONTEXT_PATH: /prod
+          FILAZERO_HTTP_API_STAGE_PREFIX: /prod
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PatientsTable
