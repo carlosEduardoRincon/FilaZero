@@ -5,6 +5,8 @@ import java.time.Instant;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
 
 @DynamoDbBean
 public class Triage {
@@ -26,6 +28,7 @@ public class Triage {
     }
 
     @DynamoDbAttribute("patientId")
+    @DynamoDbSecondaryPartitionKey(indexNames = {"byPatientId"})
     public String getPatientId() {
         return patientId;
     }
@@ -71,6 +74,7 @@ public class Triage {
     }
 
     @DynamoDbAttribute("createdAt")
+    @DynamoDbSecondarySortKey(indexNames = {"byPatientId"})
     public Instant getCreatedAt() {
         return createdAt;
     }

@@ -29,8 +29,8 @@ public class QueueService {
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "triage not found"));
 
         int priority = switch (String.valueOf(triage.getRisk())) {
-            case "RED" -> 1;
-            case "YELLOW" -> 2;
+            case "Vermelho (imediato) ⚠\uFE0F" -> 1;
+            case "Verde (pouco urgente) ✅" -> 2;
             default -> 3;
         };
 

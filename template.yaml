@@ -25,6 +25,8 @@ Resources:
           AttributeType: S
         - AttributeName: cpfHash
           AttributeType: S
+        - AttributeName: phone
+          AttributeType: S
       KeySchema:
         - AttributeName: patientId
           KeyType: HASH
@@ -32,6 +34,12 @@ Resources:
         - IndexName: byCpfHash
           KeySchema:
             - AttributeName: cpfHash
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+        - IndexName: byPhone
+          KeySchema:
+            - AttributeName: phone
               KeyType: HASH
           Projection:
             ProjectionType: ALL
@@ -44,9 +52,22 @@ Resources:
       AttributeDefinitions:
         - AttributeName: triageId
           AttributeType: S
+        - AttributeName: patientId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
       KeySchema:
         - AttributeName: triageId
           KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: byPatientId
+          KeySchema:
+            - AttributeName: patientId
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
 
   QueueTicketsTable:
     Type: AWS::DynamoDB::Table

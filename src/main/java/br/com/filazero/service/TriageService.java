@@ -2,27 +2,43 @@ package br.com.filazero.service;
 
 import br.com.filazero.api.dto.EvaluateTriageRequest;
 import br.com.filazero.domain.Triage;
+import br.com.filazero.repo.PatientRepository;
 import br.com.filazero.repo.TriageRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class TriageService {
     private final TriageRepository repo;
+    private final PatientRepository patients;
     private final ObjectMapper objectMapper;
     private final SymptomAlertAnalyzer symptomAlertAnalyzer;
 
     public TriageService(
-            TriageRepository repo, ObjectMapper objectMapper, SymptomAlertAnalyzer symptomAlertAnalyzer) {
+            TriageRepository repo,
+            PatientRepository patients,
+            ObjectMapper objectMapper,
+            SymptomAlertAnalyzer symptomAlertAnalyzer) {
         this.repo = repo;
+        this.patients = patients;
         this.objectMapper = objectMapper;
         this.symptomAlertAnalyzer = symptomAlertAnalyzer;
+    }
+
+    public Triage findLatestByPhone(String phone) {
+        var patient =
+                patients
+                        .getByPhone(phone)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "patient not found"));
+        return repo.findLatestByPatientId(patient.getPatientId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "triage not found"));
     }
 
     public Triage evaluate(EvaluateTriageRequest evaluateTriageRequest) {

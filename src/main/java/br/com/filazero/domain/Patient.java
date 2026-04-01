@@ -25,6 +25,7 @@ public class Patient {
     }
 
     @DynamoDbAttribute("phone")
+    @DynamoDbSecondaryPartitionKey(indexNames = {"byPhone"})
     public String getPhone() {
         return phone;
     }
