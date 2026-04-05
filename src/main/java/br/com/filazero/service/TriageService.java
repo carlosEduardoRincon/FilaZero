@@ -19,17 +19,14 @@ public class TriageService {
     private final TriageRepository repo;
     private final PatientRepository patients;
     private final ObjectMapper objectMapper;
-    private final SymptomAlertAnalyzer symptomAlertAnalyzer;
 
     public TriageService(
             TriageRepository repo,
             PatientRepository patients,
-            ObjectMapper objectMapper,
-            SymptomAlertAnalyzer symptomAlertAnalyzer) {
+            ObjectMapper objectMapper) {
         this.repo = repo;
         this.patients = patients;
         this.objectMapper = objectMapper;
-        this.symptomAlertAnalyzer = symptomAlertAnalyzer;
     }
 
     public Triage findLatestByPhone(String phone) {
@@ -42,9 +39,7 @@ public class TriageService {
     }
 
     public Triage evaluate(EvaluateTriageRequest evaluateTriageRequest) {
-        boolean explicitAlarm = Boolean.TRUE.equals(evaluateTriageRequest.isUrgent());
-        boolean symptomTextAlarm = symptomAlertAnalyzer.hasAlertSignal(evaluateTriageRequest.symptomDescription());
-        boolean isUrgent = explicitAlarm || symptomTextAlarm;
+        boolean isUrgent = Boolean.TRUE.equals(evaluateTriageRequest.isUrgent());
 
         // Vermelho (imediato), Amarelo (urgente), Verde (pouco urgente) e Azul (não urgente).
         String risk = isUrgent ? "Vermelho (imediato) ⚠\uFE0F" : "Verde (pouco urgente) ✅";

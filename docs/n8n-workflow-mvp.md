@@ -30,7 +30,7 @@ Arquivo importavel: `docs/n8n-workflow-mvp.json`
    - Guarde `sessionState`, `patientId`, `triageId`, `ticketId` (Redis, Postgres, Data Store do n8n, etc.).
    - Na proxima mensagem do mesmo telefone, injete esses campos no webhook payload.
 4. Ativar workflow.
-5. A IA usa o campo `answers.symptomDescription` para inferir sinal de alerta (texto livre do paciente).
+5. O risco na triagem segue apenas o indicador de urgencia enviado pelo fluxo (ex.: campo `alarm` / `isUrgent` na chamada a `/api/triages/evaluate`). O texto dos sintomas pode ser enviado para registro, sem inferencia automatica na API.
 
 ## Payload de entrada esperado (exemplo)
 

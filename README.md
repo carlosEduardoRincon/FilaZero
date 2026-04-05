@@ -32,15 +32,5 @@ sam local start-api
 ```bash
 sam build
 sam deploy --guided
-
-## IA na triagem (opcional)
-
-Por padrao, a inferencia de sinal de alerta por IA vem desativada.
-
-- `AI_TRIAGE_ENABLED=false`
-- `AI_TRIAGE_MODEL_ID=amazon.nova-lite-v1:0`
-
-Quando ativada, a API considera `answers.symptomDescription` e classifica `alarm` com Bedrock.
-Se houver falha no modelo, usa fallback por palavras-chave.
 ```
 
