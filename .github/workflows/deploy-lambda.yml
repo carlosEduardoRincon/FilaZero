@@ -3,6 +3,13 @@ name: Deploy Lambda
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to checkout and deploy
+        required: true
+        default: main
+        type: string
 
 jobs:
   deploy:
@@ -11,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
 
       - name: Setup Java
         uses: actions/setup-java@v4
