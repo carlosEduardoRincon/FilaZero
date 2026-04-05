@@ -1,13 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: FilaZero API (MVP) - Spring Boot on AWS Lambda + DocumentDB (memoria nao relacional para IA)
-
-Parameters:
-  DocumentDbInstanceClass:
-    Type: String
-    Default: db.t4g.medium
-    Description: >
-      Padrao minimo de custo (burstable): db.t4g.medium. Se a regiao nao oferecer T4G, use db.t3.medium no deploy.
+Description: FilaZero API (MVP) - Spring Boot on AWS Lambda
 
 Globals:
   Function:
@@ -88,246 +81,18 @@ Resources:
         - AttributeName: ticketId
           KeyType: HASH
 
-  # --- Rede (obrigatoria para DocumentDB) ---
-  FilazeroVpc:
-    Type: AWS::EC2::VPC
-    Properties:
-      CidrBlock: 10.42.0.0/16
-      EnableDnsHostnames: true
-      EnableDnsSupport: true
-      Tags:
-        - Key: Name
-          Value: filazero-vpc
-
-  FilazeroInternetGateway:
-    Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: Name
-          Value: filazero-igw
-
-  FilazeroInternetGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      InternetGatewayId: !Ref FilazeroInternetGateway
-      VpcId: !Ref FilazeroVpc
-
-  FilazeroDynamoDbVpcEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.dynamodb
-      VpcId: !Ref FilazeroVpc
-      RouteTableIds:
-        - !Ref FilazeroPrivateRouteTable
-      VpcEndpointType: Gateway
-      PolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal: '*'
-            Action:
-              - dynamodb:*
-            Resource: '*'
-
-  FilazeroPublicSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref FilazeroVpc
-      CidrBlock: 10.42.1.0/24
-      AvailabilityZone: !Select [0, !GetAZs '']
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: filazero-public-1
-
-  FilazeroPublicSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref FilazeroVpc
-      CidrBlock: 10.42.2.0/24
-      AvailabilityZone: !Select [1, !GetAZs '']
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: filazero-public-2
-
-  FilazeroPrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref FilazeroVpc
-      CidrBlock: 10.42.11.0/24
-      AvailabilityZone: !Select [0, !GetAZs '']
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: filazero-private-1
-
-  FilazeroPrivateSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref FilazeroVpc
-      CidrBlock: 10.42.12.0/24
-      AvailabilityZone: !Select [1, !GetAZs '']
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: filazero-private-2
-
-  FilazeroNatEip:
-    Type: AWS::EC2::EIP
-    DependsOn: FilazeroInternetGatewayAttachment
-    Properties:
-      Domain: vpc
-      Tags:
-        - Key: Name
-          Value: filazero-nat-eip
-
-  FilazeroNatGateway:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt FilazeroNatEip.AllocationId
-      SubnetId: !Ref FilazeroPublicSubnet1
-      Tags:
-        - Key: Name
-          Value: filazero-nat
-
-  FilazeroPublicRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref FilazeroVpc
-      Tags:
-        - Key: Name
-          Value: filazero-public-rt
-
-  FilazeroPublicDefaultRoute:
-    Type: AWS::EC2::Route
-    DependsOn: FilazeroInternetGatewayAttachment
-    Properties:
-      RouteTableId: !Ref FilazeroPublicRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref FilazeroInternetGateway
-
-  FilazeroPublicSubnet1RouteAssoc:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref FilazeroPublicSubnet1
-      RouteTableId: !Ref FilazeroPublicRouteTable
-
-  FilazeroPublicSubnet2RouteAssoc:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref FilazeroPublicSubnet2
-      RouteTableId: !Ref FilazeroPublicRouteTable
-
-  FilazeroPrivateRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref FilazeroVpc
-      Tags:
-        - Key: Name
-          Value: filazero-private-rt
-
-  FilazeroPrivateDefaultRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref FilazeroPrivateRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref FilazeroNatGateway
-
-  FilazeroPrivateSubnet1RouteAssoc:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref FilazeroPrivateSubnet1
-      RouteTableId: !Ref FilazeroPrivateRouteTable
-
-  FilazeroPrivateSubnet2RouteAssoc:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref FilazeroPrivateSubnet2
-      RouteTableId: !Ref FilazeroPrivateRouteTable
-
-  FilazeroLambdaSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: FilaZero Lambda - saida para DocumentDB e internet via NAT
-      VpcId: !Ref FilazeroVpc
-      SecurityGroupEgress:
-        - IpProtocol: '-1'
-          CidrIp: 0.0.0.0/0
-
-  FilazeroDocDbSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: DocumentDB - apenas Lambda FilaZero na porta 27017
-      VpcId: !Ref FilazeroVpc
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 27017
-          ToPort: 27017
-          SourceSecurityGroupId: !Ref FilazeroLambdaSecurityGroup
-
-  # --- DocumentDB (API compativel com MongoDB; TLS obrigatorio no cliente) ---
-  FilazeroAiMemoryDocDbSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Description: Usuario e senha master do DocumentDB (memoria IA / documentos)
-      GenerateSecretString:
-        SecretStringTemplate: '{"username": "filazeroaimemory"}'
-        GenerateStringKey: password
-        PasswordLength: 32
-        ExcludeCharacters: '"@/\'
-
-  FilazeroAiMemoryDbSubnetGroup:
-    Type: AWS::DocDB::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: Subnets privadas para DocumentDB FilaZero IA
-      SubnetIds:
-        - !Ref FilazeroPrivateSubnet1
-        - !Ref FilazeroPrivateSubnet2
-
-  FilazeroAiMemoryDocDbCluster:
-    Type: AWS::DocDB::DBCluster
-    DeletionPolicy: Snapshot
-    UpdateReplacePolicy: Snapshot
-    Properties:
-      DBClusterIdentifier: filazero-ai-memory-docdb
-      EngineVersion: '5.0.0'
-      DBSubnetGroupName: !Ref FilazeroAiMemoryDbSubnetGroup
-      VpcSecurityGroupIds:
-        - !Ref FilazeroDocDbSecurityGroup
-      MasterUsername: filazeroaimemory
-      MasterUserPassword: !Sub '{{resolve:secretsmanager:${FilazeroAiMemoryDocDbSecret}:SecretString:password}}'
-      StorageEncrypted: true
-      BackupRetentionPeriod: 1
-      Port: 27017
-
-  FilazeroAiMemoryDocDbInstance:
-    Type: AWS::DocDB::DBInstance
-    Properties:
-      DBClusterIdentifier: !Ref FilazeroAiMemoryDocDbCluster
-      DBInstanceClass: !Ref DocumentDbInstanceClass
-
   FilaZeroApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: filazero-api-mvp
       CodeUri: target/filazero-api-0.0.1-SNAPSHOT.jar
       Handler: br.com.filazero.StreamLambdaHandler::handleRequest
-      VpcConfig:
-        SecurityGroupIds:
-          - !Ref FilazeroLambdaSecurityGroup
-        SubnetIds:
-          - !Ref FilazeroPrivateSubnet1
-          - !Ref FilazeroPrivateSubnet2
       Environment:
         Variables:
           PATIENTS_TABLE: !Ref PatientsTable
           TRIAGES_TABLE: !Ref TriagesTable
           QUEUE_TICKETS_TABLE: !Ref QueueTicketsTable
           FILAZERO_HTTP_API_STAGE_PREFIX: /prod
-          DOCUMENTDB_CLUSTER_ENDPOINT: !GetAtt FilazeroAiMemoryDocDbCluster.Endpoint
-          DOCUMENTDB_PORT: '27017'
-          DOCUMENTDB_SECRET_ARN: !Ref FilazeroAiMemoryDocDbSecret
-          DOCUMENTDB_DB_NAME: filazero_ai_memory
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PatientsTable
@@ -335,11 +100,6 @@ Resources:
             TableName: !Ref TriagesTable
         - DynamoDBCrudPolicy:
             TableName: !Ref QueueTicketsTable
-        - Statement:
-            Effect: Allow
-            Action:
-              - secretsmanager:GetSecretValue
-            Resource: !Ref FilazeroAiMemoryDocDbSecret
       Events:
         ProxyApi:
           Type: HttpApi
@@ -358,12 +118,3 @@ Outputs:
   ApiUrl:
     Description: Base URL for HttpApi
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
-  DocumentDbClusterEndpoint:
-    Description: Endpoint do cluster DocumentDB (use TLS; URI estilo MongoDB)
-    Value: !GetAtt FilazeroAiMemoryDocDbCluster.Endpoint
-  DocumentDbSecretArn:
-    Description: ARN do secret com username (filazeroaimemory) e password
-    Value: !Ref FilazeroAiMemoryDocDbSecret
-  DocumentDbConnectionHint:
-    Description: Variaveis ja injetadas na Lambda; cliente deve usar TLS e CA da Amazon RDS
-    Value: 'mongodb://USER:PASS@ENDPOINT:27017/filazero_ai_memory?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false'
