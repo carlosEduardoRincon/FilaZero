@@ -10,12 +10,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 @RestController
 public class QueueController {
+    private static final ZoneId WINDOW_DISPLAY_TZ = ZoneId.of("America/Sao_Paulo");
+    private static final DateTimeFormatter WINDOW_DISPLAY_FMT =
+            DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy").withZone(WINDOW_DISPLAY_TZ);
+
     private final QueueService service;
 
     public QueueController(QueueService service) {
         this.service = service;
+    }
+
+    private static String formatWindow(Instant instant) {
+        return WINDOW_DISPLAY_FMT.format(instant);
     }
 
     @PostMapping(
@@ -25,7 +37,11 @@ public class QueueController {
     public CreateQueueTicketResponse create(@Valid @RequestBody CreateQueueTicketRequest request) {
         var t = service.createTicket(request.triageId(), String.valueOf(request.unitId()));
         return new CreateQueueTicketResponse(
-                t.getTicketId(), t.getPriority(), t.getStatus(), t.getWindowStart(), t.getWindowEnd());
+                t.getTicketId(),
+                t.getPriority(),
+                t.getStatus(),
+                formatWindow(t.getWindowStart()),
+                formatWindow(t.getWindowEnd()));
     }
 
     @PostMapping(
@@ -34,7 +50,11 @@ public class QueueController {
     public CreateQueueTicketResponse checkin(@PathVariable("id") String ticketId) {
         var t = service.checkin(ticketId);
         return new CreateQueueTicketResponse(
-                t.getTicketId(), t.getPriority(), t.getStatus(), t.getWindowStart(), t.getWindowEnd());
+                t.getTicketId(),
+                t.getPriority(),
+                t.getStatus(),
+                formatWindow(t.getWindowStart()),
+                formatWindow(t.getWindowEnd()));
     }
 }
 
