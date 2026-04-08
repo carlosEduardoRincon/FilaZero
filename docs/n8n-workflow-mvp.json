@@ -1,21 +1,20 @@
 {
-  "name": "FilaZero MVP - WhatsApp Triagem e Fila",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "filazero-whatsapp-webhook",
-        "responseMode": "responseNode",
+        "path": "filazero-whatsapp-webhook2",
         "options": {}
       },
-      "id": "webhook_in",
+      "id": "5aaa5ac0-9c87-4ccb-b27b-1f32a540d014",
       "name": "Webhook In",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        200,
-        300
-      ]
+        -880,
+        240
+      ],
+      "webhookId": "6487a380-5c8f-429b-a374-20c8c2327e45"
     },
     {
       "parameters": {
@@ -24,56 +23,74 @@
             {
               "id": "a1",
               "name": "phone",
-              "value": "={{ $json.body.phone || $json.phone || \"\" }}",
-              "type": "string"
-            },
-            {
-              "id": "a2",
-              "name": "text",
-              "value": "={{ ($json.body.text || $json.text || \"\").toLowerCase() }}",
+              "value": "={{ $json.phone }}",
               "type": "string"
             },
             {
               "id": "a3",
               "name": "sessionState",
-              "value": "={{ $json.body.sessionState || $json.sessionState || \"START\" }}",
+              "value": "={{ $json.sessionState }}",
               "type": "string"
             },
             {
               "id": "a4",
               "name": "cpf",
-              "value": "={{ $json.body.cpf || $json.cpf || \"\" }}",
+              "value": "={{ $json.data.cpf }}",
               "type": "string"
             },
             {
               "id": "a5",
               "name": "birthDate",
-              "value": "={{ $json.body.birthDate || $json.birthDate || \"\" }}",
+              "value": "={{ $json.data.birthDate }}",
               "type": "string"
             },
             {
-              "id": "a6",
-              "name": "unitId",
-              "value": "={{ $json.body.unitId || $json.unitId || \"upa-centro\" }}",
-              "type": "string"
-            },
-            {
-              "id": "a7",
-              "name": "alarm",
-              "value": "={{ $json.body.alarm || $json.alarm || false }}",
+              "id": "1a3f74f2-0dc7-4c0d-8e93-4dada7ec6595",
+              "name": "isUrgent",
+              "value": "={{ $json.data.isUrgent }}",
               "type": "boolean"
+            },
+            {
+              "id": "1b1ce609-9a28-4e82-b3c2-b9cabfa1db0f",
+              "name": "symptoms",
+              "value": "={{ $json.data.symptoms }}",
+              "type": "string"
+            },
+            {
+              "id": "fdebb3b8-7dbd-4536-952e-e00bc8b6d0cd",
+              "name": "join",
+              "value": "={{ $json.data.join }}",
+              "type": "string"
+            },
+            {
+              "id": "1656fc30-8678-4f72-ab75-dfc675719e46",
+              "name": "triageId",
+              "value": "={{ $json.triageId }}",
+              "type": "string"
+            },
+            {
+              "id": "29c146d8-81bf-4ad6-9ed7-a2920d226bb2",
+              "name": "data.arrivalConfirmed",
+              "value": "={{ $json.data.arrivalConfirmed }}",
+              "type": "boolean"
+            },
+            {
+              "id": "83888159-8782-4b7b-ba4c-3c22bd6d5bbf",
+              "name": "data.ticketId",
+              "value": "={{ $json.data.ticketId }}",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "normalize_input",
+      "id": "88fd45cd-0a19-4d89-b66d-d7efb8b674af",
       "name": "Normalizar Entrada",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        450,
-        300
+        144,
+        240
       ]
     },
     {
@@ -83,7 +100,7 @@
             {
               "conditions": {
                 "options": {
-                  "caseSensitive": false,
+                  "caseSensitive": true,
                   "leftValue": "",
                   "typeValidation": "strict",
                   "version": 2
@@ -94,7 +111,7 @@
                     "rightValue": "START",
                     "operator": {
                       "type": "string",
-                      "operation": "equals"
+                      "operation": "contains"
                     },
                     "id": "s1"
                   }
@@ -105,7 +122,7 @@
             {
               "conditions": {
                 "options": {
-                  "caseSensitive": false,
+                  "caseSensitive": true,
                   "leftValue": "",
                   "typeValidation": "strict",
                   "version": 2
@@ -116,7 +133,7 @@
                     "rightValue": "PATIENT_IDENTIFIED",
                     "operator": {
                       "type": "string",
-                      "operation": "equals"
+                      "operation": "contains"
                     },
                     "id": "s2"
                   }
@@ -127,7 +144,7 @@
             {
               "conditions": {
                 "options": {
-                  "caseSensitive": false,
+                  "caseSensitive": true,
                   "leftValue": "",
                   "typeValidation": "strict",
                   "version": 2
@@ -138,7 +155,7 @@
                     "rightValue": "TRIAGED",
                     "operator": {
                       "type": "string",
-                      "operation": "equals"
+                      "operation": "contains"
                     },
                     "id": "s3"
                   }
@@ -149,7 +166,7 @@
             {
               "conditions": {
                 "options": {
-                  "caseSensitive": false,
+                  "caseSensitive": true,
                   "leftValue": "",
                   "typeValidation": "strict",
                   "version": 2
@@ -160,7 +177,7 @@
                     "rightValue": "TICKET_CREATED",
                     "operator": {
                       "type": "string",
-                      "operation": "equals"
+                      "operation": "contains"
                     },
                     "id": "s4"
                   }
@@ -172,13 +189,13 @@
         },
         "options": {}
       },
-      "id": "switch_state",
+      "id": "2b47768c-f55c-4925-aafe-409505254b8e",
       "name": "Switch Estado da Sessao",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        700,
-        300
+        336,
+        208
       ]
     },
     {
@@ -188,7 +205,7 @@
             {
               "id": "i1",
               "name": "message",
-              "value": "Para iniciar, envie CPF, data de nascimento (AAAA-MM-DD) e se possui sinal de alarme (sim/nao).",
+              "value": "Olá! 👋\nSou o assistente de triagem e vou te ajudar a iniciar seu atendimento de forma rápida e segura.  \nPara começarmos, preciso de algumas informações:  \n- Seu CPF \n- Sua data de nascimento \n- E quais sintomas você está sentindo agora  \nAssim consigo te direcionar corretamente para o atendimento. Pode me enviar essas informações?",
               "type": "string"
             },
             {
@@ -196,24 +213,30 @@
               "name": "nextSessionState",
               "value": "PATIENT_IDENTIFIED",
               "type": "string"
+            },
+            {
+              "id": "67a6ed37-078d-48f5-a437-505e43a37712",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "ask_initial_data",
+      "id": "58cc8051-149f-4014-a3d6-8145068a6321",
       "name": "Solicitar Dados Iniciais",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        980,
-        120
+        1104,
+        -480
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.FILAZERO_API_BASE_URL + '/api/patients/identify-or-create' }}",
+        "url": "=https://jcnz1v5vd4.execute-api.us-east-1.amazonaws.com/prod/api/triages/evaluate",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -224,44 +247,31 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={ \"phone\": \"{{ $json.phone }}\", \"cpf\": \"{{ $json.cpf }}\", \"birthDate\": \"{{ $json.birthDate }}\" }",
-        "options": {}
-      },
-      "id": "api_identify_patient",
-      "name": "API Identificar Paciente",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        980,
-        260
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.FILAZERO_API_BASE_URL + '/api/triages/evaluate' }}",
-        "sendHeaders": true,
-        "headerParameters": {
+        "bodyParameters": {
           "parameters": [
             {
-              "name": "Content-Type",
-              "value": "application/json"
+              "name": "patientId",
+              "value": "={{ $json.patientId }}"
+            },
+            {
+              "name": "isUrgent",
+              "value": "={{ $json.data.isUrgent }}"
+            },
+            {
+              "name": "symptomDescription",
+              "value": "={{ $json.data.symptoms }}"
             }
           ]
         },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={ \"patientId\": \"{{ $json.patientId }}\", \"answers\": { \"alarm\": {{ $json.alarm }}, \"symptomDescription\": \"{{ $json.text }}\" } }",
         "options": {}
       },
-      "id": "api_evaluate_triage",
+      "id": "b03aea96-1763-43d9-b779-a50d364fdf43",
       "name": "API Avaliar Triagem",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1220,
-        260
+        1168,
+        -112
       ]
     },
     {
@@ -271,7 +281,7 @@
             {
               "id": "t1",
               "name": "message",
-              "value": "={{ 'Triagem concluida. Risco: ' + $json.risk + '. Recomendacao: ' + $json.recommendation + '. Deseja entrar na fila? (sim/nao)' }}",
+              "value": "={{ \n`Triagem concluída ✅: ${ $json.triageId }\n\nRisco: ${ $json.risk }\nRecomendação: ${ $json.recommendation }\n\n${\n   $json.data.isUrgent\n    ? \"Deseja entrar na fila? (sim/não)\"\n    : \"\"\n}`\n}}",
               "type": "string"
             },
             {
@@ -285,25 +295,31 @@
               "name": "nextSessionState",
               "value": "TRIAGED",
               "type": "string"
+            },
+            {
+              "id": "b8f94d16-1d38-42b3-8ce8-b850d26e6a29",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "format_triage_response",
+      "id": "e36a9cbf-d283-4c39-91b6-5aa3a4a511c0",
       "name": "Montar Resposta Triagem",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1460,
-        260
+        1584,
+        -32
       ]
     },
     {
       "parameters": {
         "conditions": {
           "options": {
-            "caseSensitive": false,
+            "caseSensitive": true,
             "leftValue": "",
             "typeValidation": "strict",
             "version": 2
@@ -311,11 +327,12 @@
           "conditions": [
             {
               "id": "q1",
-              "leftValue": "={{ $json.text }}",
+              "leftValue": "={{ $json.join.toBoolean() }}",
               "rightValue": "sim",
               "operator": {
-                "type": "string",
-                "operation": "contains"
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
               }
             }
           ],
@@ -323,19 +340,19 @@
         },
         "options": {}
       },
-      "id": "if_wants_queue",
+      "id": "d7149562-0b19-4ad3-896f-bfb0d7f8b60b",
       "name": "IF Quer Entrar na Fila",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        980,
-        420
+        704,
+        464
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.FILAZERO_API_BASE_URL + '/api/queue/tickets' }}",
+        "url": "=https://jcnz1v5vd4.execute-api.us-east-1.amazonaws.com/prod/api/queue/tickets",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -347,16 +364,16 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={ \"triageId\": \"{{ $json.triageId }}\", \"unitId\": \"{{ $json.unitId }}\" }",
+        "jsonBody": "={ \"triageId\": \"{{ $json.triageId }}\", \"unitId\": 1 }",
         "options": {}
       },
-      "id": "api_create_ticket",
+      "id": "fd6a7519-7596-481a-bb32-aaf796c44d02",
       "name": "API Criar Ticket",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1220,
-        380
+        1040,
+        368
       ]
     },
     {
@@ -366,7 +383,7 @@
             {
               "id": "tk1",
               "name": "message",
-              "value": "={{ 'Ticket criado: ' + $json.ticketId + '. Janela: ' + $json.windowStart + ' ate ' + $json.windowEnd + '. Quando chegar, responda: cheguei.' }}",
+              "value": "={{ 'Ticket criado ✅: ' + $json.ticketId + ' \\n\\nHorário de atendimento: \\n' + $json.windowStart + ' até \\n' + $json.windowEnd + '. \\n\\nQuando chegar, responda: cheguei.' }}",
               "type": "string"
             },
             {
@@ -380,18 +397,24 @@
               "name": "nextSessionState",
               "value": "TICKET_CREATED",
               "type": "string"
+            },
+            {
+              "id": "e19529f1-9405-42a9-8773-6b61f5b88e18",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "format_ticket_response",
+      "id": "e4aebb99-37be-4c8c-96a2-3e18c8f2331f",
       "name": "Montar Resposta Ticket",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1460,
-        380
+        1584,
+        272
       ]
     },
     {
@@ -401,7 +424,7 @@
             {
               "id": "nq1",
               "name": "message",
-              "value": "Sem problema. Se os sintomas piorarem, procure uma UPA imediatamente.",
+              "value": "Sem problema. \\n Se os sintomas piorarem, procure uma UPA imediatamente.",
               "type": "string"
             },
             {
@@ -409,25 +432,31 @@
               "name": "nextSessionState",
               "value": "START",
               "type": "string"
+            },
+            {
+              "id": "da4edb28-d822-4f93-850c-604c4d226837",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "queue_declined_response",
+      "id": "322a471a-5343-4db6-92bc-c64d78516b1e",
       "name": "Resposta Sem Fila",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1220,
-        520
+        1040,
+        544
       ]
     },
     {
       "parameters": {
         "conditions": {
           "options": {
-            "caseSensitive": false,
+            "caseSensitive": true,
             "leftValue": "",
             "typeValidation": "strict",
             "version": 2
@@ -435,11 +464,11 @@
           "conditions": [
             {
               "id": "c1",
-              "leftValue": "={{ $json.text }}",
-              "rightValue": "cheguei",
+              "leftValue": "={{ $json.data.arrivalConfirmed }}",
+              "rightValue": true,
               "operator": {
-                "type": "string",
-                "operation": "contains"
+                "type": "boolean",
+                "operation": "equals"
               }
             }
           ],
@@ -447,19 +476,19 @@
         },
         "options": {}
       },
-      "id": "if_checkin_text",
+      "id": "b873d494-6e51-4365-822b-3da8e8fd0798",
       "name": "IF Paciente Chegou",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        980,
-        640
+        704,
+        848
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.FILAZERO_API_BASE_URL + '/api/queue/tickets/' + $json.ticketId + '/checkin' }}",
+        "url": "=https://jcnz1v5vd4.execute-api.us-east-1.amazonaws.com/prod/api/queue/tickets/{{ $json.data.ticketId }}/checkin",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -471,13 +500,13 @@
         },
         "options": {}
       },
-      "id": "api_checkin_ticket",
+      "id": "11be4df5-f77d-4f21-adf7-3d5d97e33174",
       "name": "API Check-in Ticket",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1220,
-        620
+        1056,
+        912
       ]
     },
     {
@@ -487,7 +516,7 @@
             {
               "id": "ci1",
               "name": "message",
-              "value": "Check-in confirmado. Aguarde ser chamado pela equipe.",
+              "value": "Check-in confirmado ✅ \nAguarde ser chamado pela equipe.",
               "type": "string"
             },
             {
@@ -495,18 +524,24 @@
               "name": "nextSessionState",
               "value": "START",
               "type": "string"
+            },
+            {
+              "id": "401c4f0a-59e3-4b65-a204-80bdc00cbdd4",
+              "name": "phone",
+              "value": "={{ $('IF Paciente Chegou').item.json.phone }}",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "format_checkin_response",
+      "id": "e963adac-501b-4abb-bca1-44b635315292",
       "name": "Montar Resposta Check-in",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1460,
-        620
+        1584,
+        848
       ]
     },
     {
@@ -529,29 +564,441 @@
         },
         "options": {}
       },
-      "id": "checkin_help_response",
+      "id": "c0843abb-4bcc-42f6-bb29-3e658a9ec996",
       "name": "Ajuda Check-in",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1220,
-        760
+        1056,
+        1072
       ]
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={ \"message\": $json.message, \"sessionState\": $json.nextSessionState, \"patientId\": $json.patientId, \"triageId\": $json.triageId, \"ticketId\": $json.ticketId }",
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f8a80f8-3d51-4b8e-be75-015188bc1e57",
+              "leftValue": "={{ $json.body.isGroup }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
         "options": {}
       },
-      "id": "webhook_response",
-      "name": "Webhook Response",
-      "type": "n8n-nodes-base.respondToWebhook",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -640,
+        240
+      ],
+      "id": "89d3a71d-e2d6-4e41-9682-721fd55bfe0f",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3EF7013A7C3FF1B6FCE7CE373DF54577/token/87C2F008F9942C85862B9FCF/send-text",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2736,
+        224
+      ],
+      "id": "42db2e5a-5d7c-43a9-8961-54daeb1a0794",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5Djt4idWiQ5tIreg",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractJSON(raw) {\n  try {\n    let cleaned = raw\n      .replace(/```json\\s*/gi, '')\n      .replace(/```\\s*/g, '')\n      .trim();\n\n    const firstBrace = cleaned.indexOf('{');\n    const lastBrace = cleaned.lastIndexOf('}');\n\n    if (firstBrace === -1 || lastBrace === -1) {\n      throw new Error('JSON não encontrado');\n    }\n\n    const jsonString = cleaned.substring(firstBrace, lastBrace + 1);\n\n    return JSON.parse(jsonString);\n\n  } catch (error) {\n    console.error('Erro ao parsear JSON:', error.message);\n    return null;\n  }\n}\n\n// 🔥 n8n espera isso:\nconst raw = $json.output;\n\nconst parsed = extractJSON(raw);\n\nreturn [\n  {\n    json: parsed || {}\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        240
+      ],
+      "id": "e8091376-24b2-4971-970a-aab12908d1fa",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        928,
+        -16
+      ],
+      "id": "13fde8d6-25a7-44da-a157-95b5d71480a6",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1408,
+        -32
+      ],
+      "id": "a7e08bf3-5dad-4928-867f-2ff0cff29fcf",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.text.message }}",
+        "options": {
+          "systemMessage": "=📌 Prompt do Agente (Classificação + Extração + Urgência)\n\nVocê é um agente responsável por:\n\nClassificar o estágio do paciente\nExtrair informações da mensagem\nAvaliar se os sintomas indicam urgência médica\nRetornar tudo estruturado em JSON\n\n📌 Estados possíveis (sessionState)\nSTART\nPATIENT_IDENTIFIED\nTRIAGED\nTICKET_CREATED\n\n📌 Campos a extrair\n\ncpf: apenas números\nbirthDate: formato YYYY-MM-DD\nsymptoms: lista de sintomas\nqueueConfirmation: \"SIM\" ou \"NAO\"\narrivalConfirmed: true ou false\nisUrgent: true ou false (novo campo)\n\n📌 Regras de Classificação\nSTART\nIntenção inicial de atendimento, com uma mensagem solicitando atendimento (\"Olá\", \"Oi\", \"Preciso de atendimento\")\n\nPATIENT_IDENTIFIED\nCPF + data de nascimento + sintomas\n\nTRIAGED\nMensagem de sim ou não, nessa etapa tentar buscar na memória o ID de triagem do paciente, apenas se existir na memória\n\nTICKET_CREATED\nConfirmação de chegada ao hospital e devolver um objeto json contendo um campo arrived como true e o ticket ID do paciente, apenas se existir na memória\n{\n  \"sessionState\": \"TICKET_CREATED\",\n  \"phone\": \"12312312321\",\n  \"data\": {\n    \"arrivalConfirmed\": null,\n\t\"ticketId\": \"321312231\"\n  }\n}\n\n📌 Regras de Urgência (isUrgent)\n\nClassifique como true (urgente) se houver sintomas como:\n\nDor no peito\nFalta de ar / dificuldade para respirar\nDesmaio\nConfusão mental\nConvulsão\nSangramento intenso\nSintomas de AVC (fraqueza de um lado do corpo, fala embolada)\nFebre muito alta persistente (ex: > 39°C com outros sintomas graves)\n\nClassifique como false (não urgente) se:\n\nSintomas leves ou moderados\nSem risco imediato aparente\n\nSe não houver sintomas suficientes → null\n\n📌 Regras Gerais\n\nRetorne apenas JSON válido\nNão invente dados\nNormalize CPF e datas\nSintomas sempre em lista\nSe houver ambiguidade, escolha o estado mais avançado\nAvalie urgência apenas com base nos sintomas informados\n\n📌 Formato de Saída (OBRIGATÓRIO)\n{\n  \"sessionState\": \"PATIENT_IDENTIFIED\",\n  \"phone\": \"12312312321\",\n  \"data\": {\n    \"cpf\": \"12345678900\",\n    \"birthDate\": \"1990-05-10\",\n    \"symptoms\": [\"dor no peito\", \"falta de ar\"],\n    \"queueConfirmation\": null,\n    \"arrivalConfirmed\": null,\n    \"isUrgent\": true\n  }\n}\n\n📌 Formato de Saída (OBRIGATÓRIO)\n{\n  \"sessionState\": \"TRIAGED\",\n  \"triageId\": \"12312312312\"\n  \"phone\": \"12312312321\",\n  \"data\": {\n    \"join\": true/false\n  }\n}\n\n📌 Exemplos\n\nEntrada:\n\n\"Estou com dor no peito e falta de ar\"\n\n{\n  \"sessionState\": \"START\",\n  \"phone\": \"12312312321\",\n  \"data\": {\n    \"cpf\": null,\n    \"birthDate\": null,\n    \"symptoms\": [\"dor no peito\", \"falta de ar\"],\n    \"queueConfirmation\": null,\n    \"arrivalConfirmed\": null,\n    \"isUrgent\": true\n  }\n}\n\nEntrada:\n\n\"Estou com dor de cabeça leve\"\n\n{\n  \"sessionState\": \"START\",\n  \"phone\": \"12312312321\",\n  \"data\": {\n    \"cpf\": null,\n    \"birthDate\": null,\n    \"symptoms\": [\"dor de cabeça leve\"],\n    \"queueConfirmation\": null,\n    \"arrivalConfirmed\": null,\n    \"isUrgent\": false\n  }\n} mensagem de entrada: {{ $json.body.text.message }} phone: {{ $json.body.phone }}",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -416,
+        240
+      ],
+      "id": "8fcc35d8-4dee-4604-9f4c-136f4efba407",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "={{ $json.message }}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
       "typeVersion": 1.1,
       "position": [
-        1760,
-        460
+        2720,
+        400
+      ],
+      "id": "87c353b3-d36a-4cbf-be0e-c2225d404445",
+      "name": "Chat Memory Manager1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.phone }}",
+        "databaseName": "FileZero"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        544
+      ],
+      "id": "83bb5537-7976-4989-a96b-4098bf7989a8",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "8LeNqRzB2TjTKutP",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.phone }}",
+        "collectionName": "=n8n_chat_histories",
+        "databaseName": "FileZero"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        576
+      ],
+      "id": "510eb84b-f61e-48dd-83ad-19711b6edc46",
+      "name": "MongoDB Chat Memory1",
+      "credentials": {
+        "mongoDb": {
+          "id": "8LeNqRzB2TjTKutP",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        432
+      ],
+      "id": "6197711a-1747-4802-982c-a8df8afddf3b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Zt3ARPUVQiojCGae",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1408,
+        272
+      ],
+      "id": "458f1951-d04a-44c3-8225-2dac9f5bdb5c",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e6009b0-5b4b-4c41-9294-6e05fac57147",
+              "name": "phone",
+              "value": "={{ $('Normalizar Entrada').item.json.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "5fe5acab-1e55-4f0e-8198-c030f9f040bd",
+              "name": "sessionState",
+              "value": "={{ $('Code in JavaScript').item.json.sessionState }}",
+              "type": "string"
+            },
+            {
+              "id": "3ce94748-9331-4b33-b007-b5e3f53c5dd6",
+              "name": "data.cpf",
+              "value": "={{ $('Code in JavaScript').item.json.data.cpf }}",
+              "type": "string"
+            },
+            {
+              "id": "24688754-3eae-486c-b547-a21f6c48b894",
+              "name": "data.birthDate",
+              "value": "={{ $('Code in JavaScript').item.json.data.birthDate }}",
+              "type": "string"
+            },
+            {
+              "id": "ab8b251e-a034-4a0c-bb75-ead1cab5942b",
+              "name": "data.isUrgent",
+              "value": "={{ $('Code in JavaScript').item.json.data.isUrgent }}",
+              "type": "string"
+            },
+            {
+              "id": "403ed4d8-8e2f-4533-8372-c89728af92c2",
+              "name": "data.symptoms",
+              "value": "={{ $('Code in JavaScript').item.json.data.symptoms }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        80
+      ],
+      "id": "f8afb20a-8fce-42e9-9ff7-d92ffc7df257",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1408,
+        848
+      ],
+      "id": "4e4eeecf-4785-428b-8333-e140f99ff534",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "content": "## Recebimento das mensagens e redirecionamento\n\n",
+        "height": 608,
+        "width": 1440,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "d3115029-6704-4d36-a64e-902e45ce520b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Cadastro do paciente e triagem\n",
+        "height": 400,
+        "width": 1056,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        656,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "0b5c86d8-e09d-401a-b413-a2d189364408",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://jcnz1v5vd4.execute-api.us-east-1.amazonaws.com/prod/api/patients/identify-or-create",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"phone\": \"{{ $json.phone }}\", \"cpf\": \"{{ $json.cpf }}\", \"birthDate\": \"{{ $json.birthDate }}\" }",
+        "options": {}
+      },
+      "id": "90ca1497-03d5-46cf-8b31-a8c392816b5c",
+      "name": "API Identificar Paciente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        704,
+        -112
       ]
+    },
+    {
+      "parameters": {
+        "content": "## Registro do paciente na fila\n",
+        "height": 448,
+        "width": 1056,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        656,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "880708f3-b608-4d42-a29c-b4ae1b7efa3e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Registro da chegada do paciente\n",
+        "height": 512,
+        "width": 1056,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        656,
+        736
+      ],
+      "typeVersion": 1,
+      "id": "2dae729a-64f6-480b-ba95-0f62f428e134",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Retorno\n",
+        "height": 592,
+        "width": 368,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2688,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "5fcc3e4f-6e0b-40e6-8463-d017eaeefff2",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Solicitação inicial dos dados do paciente\n",
+        "height": 400,
+        "width": 1056,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        656,
+        -608
+      ],
+      "typeVersion": 1,
+      "id": "9b753eca-e521-4b9c-97c2-be240c4de11a",
+      "name": "Sticky Note5"
     }
   ],
   "connections": {
@@ -559,7 +1006,7 @@
       "main": [
         [
           {
-            "node": "Normalizar Entrada",
+            "node": "Filter",
             "type": "main",
             "index": 0
           }
@@ -588,6 +1035,11 @@
         ],
         [
           {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
             "node": "API Identificar Paciente",
             "type": "main",
             "index": 0
@@ -596,6 +1048,11 @@
         [
           {
             "node": "IF Quer Entrar na Fila",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
             "type": "main",
             "index": 0
           }
@@ -613,18 +1070,12 @@
       "main": [
         [
           {
-            "node": "Webhook Response",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "API Identificar Paciente": {
-      "main": [
-        [
+          },
           {
-            "node": "API Avaliar Triagem",
+            "node": "Chat Memory Manager1",
             "type": "main",
             "index": 0
           }
@@ -635,7 +1086,7 @@
       "main": [
         [
           {
-            "node": "Montar Resposta Triagem",
+            "node": "Merge1",
             "type": "main",
             "index": 0
           }
@@ -646,7 +1097,12 @@
       "main": [
         [
           {
-            "node": "Webhook Response",
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chat Memory Manager1",
             "type": "main",
             "index": 0
           }
@@ -675,9 +1131,9 @@
       "main": [
         [
           {
-            "node": "Montar Resposta Ticket",
+            "node": "Merge2",
             "type": "main",
-            "index": 0
+            "index": 1
           }
         ]
       ]
@@ -686,7 +1142,12 @@
       "main": [
         [
           {
-            "node": "Webhook Response",
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chat Memory Manager1",
             "type": "main",
             "index": 0
           }
@@ -697,7 +1158,7 @@
       "main": [
         [
           {
-            "node": "Webhook Response",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
@@ -707,6 +1168,11 @@
     "IF Paciente Chegou": {
       "main": [
         [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          },
           {
             "node": "API Check-in Ticket",
             "type": "main",
@@ -726,9 +1192,9 @@
       "main": [
         [
           {
-            "node": "Montar Resposta Check-in",
+            "node": "Merge3",
             "type": "main",
-            "index": 0
+            "index": 1
           }
         ]
       ]
@@ -737,7 +1203,12 @@
       "main": [
         [
           {
-            "node": "Webhook Response",
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chat Memory Manager1",
             "type": "main",
             "index": 0
           }
@@ -748,7 +1219,154 @@
       "main": [
         [
           {
-            "node": "Webhook Response",
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chat Memory Manager1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "API Avaliar Triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Montar Resposta Triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Chat Memory Manager1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Montar Resposta Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Montar Resposta Check-in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Identificar Paciente": {
+      "main": [
+        [
+          {
+            "node": "Merge",
             "type": "main",
             "index": 0
           }
@@ -756,14 +1374,9 @@
       ]
     }
   },
-  "active": false,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "1",
+  "pinData": {},
   "meta": {
-    "templateCredsSetupCompleted": false
-  },
-  "pinData": {}
+    "templateCredsSetupCompleted": true,
+    "instanceId": "005c929a46c008070c815b47fe6344fc33ccf50bc731313343685a2728b3fdfc"
+  }
 }
-

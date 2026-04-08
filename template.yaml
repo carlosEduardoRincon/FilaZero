@@ -14,6 +14,22 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: prod
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - "*"
+        AllowOrigins:
+          - "http://localhost:5173"
+          - "http://localhost:4173"
+          - "http://127.0.0.1:5173"
+          - "http://127.0.0.1:4173"
+        MaxAge: 600
 
   PatientsTable:
     Type: AWS::DynamoDB::Table
