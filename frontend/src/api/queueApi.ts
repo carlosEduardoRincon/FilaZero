@@ -42,11 +42,26 @@ export async function finishTicket(
   return json<CreateQueueTicketResponse>(res);
 }
 
-export async function createTicket(triageId: string, unitId: number): Promise<CreateQueueTicketResponse> {
+export async function noShowFromWaiting(ticketId: string): Promise<CreateQueueTicketResponse> {
+  const res = await fetch(apiUrl(`/api/queue/tickets/${encodeURIComponent(ticketId)}/no-show-waiting`), {
+    method: "POST",
+  });
+  return json<CreateQueueTicketResponse>(res);
+}
+
+export async function createTicket(
+  triageId: string,
+  unitId: number,
+  options?: { alreadyAtReception?: boolean },
+): Promise<CreateQueueTicketResponse> {
+  const body: { triageId: string; unitId: number; alreadyAtReception?: boolean } = { triageId, unitId };
+  if (options?.alreadyAtReception) {
+    body.alreadyAtReception = true;
+  }
   const res = await fetch(apiUrl("/api/queue/tickets"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ triageId, unitId }),
+    body: JSON.stringify(body),
   });
   return json<CreateQueueTicketResponse>(res);
 }

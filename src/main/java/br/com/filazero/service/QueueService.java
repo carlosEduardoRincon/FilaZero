@@ -29,7 +29,7 @@ public class QueueService {
         this.triages = triages;
     }
 
-    public QueueTicket createTicket(String triageId, String unitId) {
+    public QueueTicket createTicket(String triageId, String unitId, boolean alreadyAtReception) {
         var triage =
                 triages
                         .getById(triageId)
@@ -47,8 +47,13 @@ public class QueueService {
         t.setTriageId(triageId);
         t.setUnitId(unitId);
         t.setPriority(priority);
-        t.setStatus("WAITING");
         t.setCreatedAt(now);
+        if (alreadyAtReception) {
+            t.setStatus("CHECKED_IN");
+            t.setCheckinAt(now);
+        } else {
+            t.setStatus("WAITING");
+        }
         t.setWindowStart(now.plus(Duration.ofMinutes(15)));
         t.setWindowEnd(now.plus(Duration.ofMinutes(45)));
 
@@ -105,6 +110,23 @@ public class QueueService {
         Instant now = Instant.now();
         t.setStatus(outcome);
         t.setFinishedAt(now);
+        persist(t);
+        return t;
+    }
+
+    /** Paciente não compareceu antes de registrar chegada na unidade (WAITING → NO_SHOW). */
+    public QueueTicket noShowFromWaiting(String ticketId) {
+        QueueTicket t =
+                tickets
+                        .getById(ticketId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ticket not found"));
+
+        if (!"WAITING".equals(t.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "ticket not in WAITING status");
+        }
+
+        t.setStatus("NO_SHOW");
+        t.setFinishedAt(Instant.now());
         persist(t);
         return t;
     }

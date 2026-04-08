@@ -36,7 +36,11 @@ public class QueueController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public CreateQueueTicketResponse create(@Valid @RequestBody CreateQueueTicketRequest request) {
-        var t = service.createTicket(request.triageId(), String.valueOf(request.unitId()));
+        var t =
+                service.createTicket(
+                        request.triageId(),
+                        String.valueOf(request.unitId()),
+                        Boolean.TRUE.equals(request.alreadyAtReception()));
         return QueueTicketApiMapper.toSummary(t);
     }
 
@@ -57,6 +61,11 @@ public class QueueController {
     public CreateQueueTicketResponse finish(
             @PathVariable("id") String ticketId, @Valid @RequestBody FinishTicketRequest body) {
         return QueueTicketApiMapper.toSummary(service.finish(ticketId, body.outcome()));
+    }
+
+    @PostMapping(path = "/api/queue/tickets/{id}/no-show-waiting", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CreateQueueTicketResponse noShowFromWaiting(@PathVariable("id") String ticketId) {
+        return QueueTicketApiMapper.toSummary(service.noShowFromWaiting(ticketId));
     }
 
     @GetMapping(path = "/api/queue/tickets/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

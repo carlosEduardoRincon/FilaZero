@@ -79,7 +79,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"triageId\": \"{{triageId}}\",\n  \"unitId\": {{unitId}}\n}"
+              "raw": "{\n  \"triageId\": \"{{triageId}}\",\n  \"unitId\": {{unitId}},\n  \"alreadyAtReception\": false\n}"
             },
             "url": "{{baseUrl}}/api/queue/tickets"
           }
@@ -98,6 +98,14 @@
             "method": "POST",
             "header": [],
             "url": "{{baseUrl}}/api/queue/tickets/{{ticketId}}/checkin"
+          }
+        },
+        {
+          "name": "POST no-show-waiting (WAITING → NO_SHOW)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/queue/tickets/{{ticketId}}/no-show-waiting"
           }
         },
         {

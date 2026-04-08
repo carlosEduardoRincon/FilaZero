@@ -62,7 +62,7 @@ export function AttendancePage() {
       return;
     }
     void run(async () => {
-      const r = await api.createTicket(tri, uid);
+      const r = await api.createTicket(tri, uid, { alreadyAtReception: true });
       setTriageForNew("");
       setNewTicketHint(`Ticket criado: ${r.ticketId.slice(0, 8)}…`);
     });
@@ -72,8 +72,8 @@ export function AttendancePage() {
     <>
       <h1 className="page-title">Painel de atendimento</h1>
       <p className="page-sub">
-        Acompanhe a fila, registre chegada, chame pacientes e encerre atendimentos. Atualização automática a cada 4
-        segundos.
+        Acompanhe a fila: marque não comparecimento ainda em aguardando chegada, registre chegada, chame na recepção e
+        conclua o atendimento quando já foi chamado. Atualização automática a cada 4 segundos.
       </p>
 
       <div className="unit-bar">
@@ -121,6 +121,9 @@ export function AttendancePage() {
         </form>
         <div className="optional-block">
           <h3>Novo ticket na fila</h3>
+          <p className="ticket-meta" style={{ marginBottom: "0.65rem" }}>
+            O ticket é criado já na coluna <strong>Na recepção</strong> (check-in automático na unidade).
+          </p>
           <form className="checkin-row" onSubmit={onNewTicket}>
             <input
               type="text"
@@ -146,7 +149,16 @@ export function AttendancePage() {
           </div>
           <div className="column-body">
             {panel?.waiting.map((t) => (
-              <TicketCard key={t.ticketId} ticket={t} />
+              <TicketCard key={t.ticketId} ticket={t}>
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm"
+                  disabled={busy}
+                  onClick={() => void run(() => api.noShowFromWaiting(t.ticketId))}
+                >
+                  Não compareceu
+                </button>
+              </TicketCard>
             ))}
             {panel && panel.waiting.length === 0 && (
               <p className="ticket-meta" style={{ margin: "0.5rem" }}>
@@ -197,14 +209,6 @@ export function AttendancePage() {
                   onClick={() => void run(() => api.finishTicket(t.ticketId, "DONE"))}
                 >
                   Concluir
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger btn-sm"
-                  disabled={busy}
-                  onClick={() => void run(() => api.finishTicket(t.ticketId, "NO_SHOW"))}
-                >
-                  Não compareceu
                 </button>
               </TicketCard>
             ))}
