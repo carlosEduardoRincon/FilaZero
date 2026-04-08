@@ -64,7 +64,7 @@ export function AttendancePage() {
     void run(async () => {
       const r = await api.createTicket(tri, uid, { alreadyAtReception: true });
       setTriageForNew("");
-      setNewTicketHint(`Ticket criado: ${r.ticketId.slice(0, 8)}…`);
+      setNewTicketHint(`Ticket criado: ${r.ticketId}`);
     });
   }
 
@@ -127,7 +127,7 @@ export function AttendancePage() {
           <form className="checkin-row" onSubmit={onNewTicket}>
             <input
               type="text"
-              placeholder="ID da triagem (triageId)"
+              placeholder="ID da triagem (UUID)"
               value={triageForNew}
               onChange={(e) => setTriageForNew(e.target.value)}
               disabled={busy}

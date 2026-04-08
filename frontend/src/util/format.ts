@@ -1,8 +1,3 @@
-export function shortTicketId(ticketId: string): string {
-  if (ticketId.length <= 12) return ticketId;
-  return `${ticketId.slice(0, 8)}…`;
-}
-
 export function formatDurationSeconds(seconds: number | null | undefined): string {
   if (seconds == null || Number.isNaN(seconds)) return "—";
   if (seconds < 60) return `${Math.round(seconds)} s`;

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { QueueTicketView } from "../api/types";
-import { priorityClass, priorityLabel, shortTicketId } from "../util/format";
+import { priorityClass, priorityLabel } from "../util/format";
 
 interface Props {
   ticket: QueueTicketView;
@@ -12,9 +12,7 @@ export function TicketCard({ ticket, children }: Props) {
   return (
     <article className="ticket-card">
       <div className="ticket-card-header">
-        <span className="ticket-id" title={ticket.ticketId}>
-          {shortTicketId(ticket.ticketId)}
-        </span>
+        <span className="ticket-id">{ticket.ticketId}</span>
         <span className={`prio-badge ${pc}`}>{priorityLabel(ticket.priority)}</span>
       </div>
       <div className="ticket-meta">
