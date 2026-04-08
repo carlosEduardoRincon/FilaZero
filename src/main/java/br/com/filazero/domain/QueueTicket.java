@@ -5,6 +5,8 @@ import java.time.Instant;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
 
 @DynamoDbBean
 public class QueueTicket {
@@ -19,6 +21,7 @@ public class QueueTicket {
     private Instant checkinAt;
     private Instant calledAt;
     private Instant finishedAt;
+    private String unitQueueSk;
 
     @DynamoDbPartitionKey
     public String getTicketId() {
@@ -39,6 +42,7 @@ public class QueueTicket {
     }
 
     @DynamoDbAttribute("unitId")
+    @DynamoDbSecondaryPartitionKey(indexNames = "byUnitQueue")
     public String getUnitId() {
         return unitId;
     }
@@ -117,6 +121,16 @@ public class QueueTicket {
 
     public void setFinishedAt(Instant finishedAt) {
         this.finishedAt = finishedAt;
+    }
+
+    @DynamoDbAttribute("unitQueueSk")
+    @DynamoDbSecondarySortKey(indexNames = "byUnitQueue")
+    public String getUnitQueueSk() {
+        return unitQueueSk;
+    }
+
+    public void setUnitQueueSk(String unitQueueSk) {
+        this.unitQueueSk = unitQueueSk;
     }
 }
 

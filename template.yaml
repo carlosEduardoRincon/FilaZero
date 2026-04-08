@@ -77,9 +77,22 @@ Resources:
       AttributeDefinitions:
         - AttributeName: ticketId
           AttributeType: S
+        - AttributeName: unitId
+          AttributeType: S
+        - AttributeName: unitQueueSk
+          AttributeType: S
       KeySchema:
         - AttributeName: ticketId
           KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: byUnitQueue
+          KeySchema:
+            - AttributeName: unitId
+              KeyType: HASH
+            - AttributeName: unitQueueSk
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
 
   FilaZeroApiFunction:
     Type: AWS::Serverless::Function
