@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import * as api from "../api/queueApi";
 import type { QueueUnitPanelResponse } from "../api/types";
+import { PatientTriageModal } from "../components/PatientTriageModal";
 import { TicketCard } from "../components/TicketCard";
 import { useUnitId } from "../hooks/useUnitId";
+import { sortTicketsByPriorityThenTime } from "../util/sortQueueTickets";
 
 export function AttendancePage() {
   const [unitId, setUnitId] = useUnitId();
@@ -13,6 +15,8 @@ export function AttendancePage() {
   const [checkinId, setCheckinId] = useState("");
   const [triageForNew, setTriageForNew] = useState("");
   const [newTicketHint, setNewTicketHint] = useState<string | null>(null);
+  const [patientModalOpen, setPatientModalOpen] = useState(false);
+  const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!unitId) return;
@@ -25,6 +29,19 @@ export function AttendancePage() {
       setError(e instanceof Error ? e.message : "Erro ao carregar painel");
     }
   }, [unitId]);
+
+  const sortedWaiting = useMemo(
+    () => (panel ? sortTicketsByPriorityThenTime(panel.waiting) : []),
+    [panel],
+  );
+  const sortedCheckedIn = useMemo(
+    () => (panel ? sortTicketsByPriorityThenTime(panel.checkedIn) : []),
+    [panel],
+  );
+  const sortedCalled = useMemo(
+    () => (panel ? sortTicketsByPriorityThenTime(panel.called) : []),
+    [panel],
+  );
 
   useEffect(() => {
     refresh();
@@ -87,6 +104,9 @@ export function AttendancePage() {
             autoComplete="off"
           />
         </div>
+        <button type="button" className="btn btn-primary" disabled={busy} onClick={() => setPatientModalOpen(true)}>
+          Paciente e triagem
+        </button>
         <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => void refresh()}>
           Atualizar agora
         </button>
@@ -103,6 +123,24 @@ export function AttendancePage() {
           {error}
         </div>
       )}
+      {successNotice && (
+        <div className="banner banner-success" role="status">
+          {successNotice}
+          <button type="button" className="banner-dismiss" onClick={() => setSuccessNotice(null)} aria-label="Fechar aviso">
+            ×
+          </button>
+        </div>
+      )}
+
+      <PatientTriageModal
+        open={patientModalOpen}
+        onClose={() => setPatientModalOpen(false)}
+        unitId={unitId}
+        onCompleted={(msg) => {
+          setSuccessNotice(msg);
+          void refresh();
+        }}
+      />
 
       <section className="checkin-box">
         <h2>Chegada na unidade</h2>
@@ -148,7 +186,7 @@ export function AttendancePage() {
             <span className="column-count">({panel?.waiting.length ?? "…"})</span>
           </div>
           <div className="column-body">
-            {panel?.waiting.map((t) => (
+            {sortedWaiting.map((t) => (
               <TicketCard key={t.ticketId} ticket={t}>
                 <button
                   type="button"
@@ -160,7 +198,7 @@ export function AttendancePage() {
                 </button>
               </TicketCard>
             ))}
-            {panel && panel.waiting.length === 0 && (
+            {panel && sortedWaiting.length === 0 && (
               <p className="ticket-meta" style={{ margin: "0.5rem" }}>
                 Nenhum paciente aguardando check-in.
               </p>
@@ -174,7 +212,7 @@ export function AttendancePage() {
             <span className="column-count">({panel?.checkedIn.length ?? "…"})</span>
           </div>
           <div className="column-body">
-            {panel?.checkedIn.map((t) => (
+            {sortedCheckedIn.map((t) => (
               <TicketCard key={t.ticketId} ticket={t}>
                 <button
                   type="button"
@@ -186,7 +224,7 @@ export function AttendancePage() {
                 </button>
               </TicketCard>
             ))}
-            {panel && panel.checkedIn.length === 0 && (
+            {panel && sortedCheckedIn.length === 0 && (
               <p className="ticket-meta" style={{ margin: "0.5rem" }}>
                 Fila vazia para chamada.
               </p>
@@ -200,7 +238,7 @@ export function AttendancePage() {
             <span className="column-count">({panel?.called.length ?? "…"})</span>
           </div>
           <div className="column-body">
-            {panel?.called.map((t) => (
+            {sortedCalled.map((t) => (
               <TicketCard key={t.ticketId} ticket={t}>
                 <button
                   type="button"
@@ -212,7 +250,7 @@ export function AttendancePage() {
                 </button>
               </TicketCard>
             ))}
-            {panel && panel.called.length === 0 && (
+            {panel && sortedCalled.length === 0 && (
               <p className="ticket-meta" style={{ margin: "0.5rem" }}>
                 Nenhum paciente chamado no momento.
               </p>
