@@ -1,0 +1,408 @@
+{
+  "info": {
+    "_postman_id": "fa2fe718-9e4e-49fe-815c-c6b42daacb9c",
+    "name": "FilaZero API",
+    "description": "Coleção dos endpoints da API FilaZero.\n\n**Local:** `baseUrl` = `http://localhost:8080` (sem prefixo de stage).\n\n**AWS Lambda (HTTP API):** use `baseUrl` = `https://{api-id}.execute-api.{região}.amazonaws.com/prod` — o prefixo `/prod` é aplicado automaticamente aos controllers em produção (`FILAZERO_HTTP_API_STAGE_PREFIX`).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46900515",
+    "_collection_link": "https://go.postman.co/collection/46900515-fa2fe718-9e4e-49fe-815c-c6b42daacb9c?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "POST identify-or-create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phone}}\",\n  \"cpf\": \"12345678901\",\n  \"birthDate\": \"1990-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/patients/identify-or-create",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "patients",
+                "identify-or-create"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Triages",
+      "item": [
+        {
+          "name": "POST evaluate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"isUrgent\": false,\n  \"symptomDescription\": \"Febre leve\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/triages/evaluate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "triages",
+                "evaluate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET by-phone",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/triages/by-phone?phone={{phone}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "triages",
+                "by-phone"
+              ],
+              "query": [
+                {
+                  "key": "phone",
+                  "value": "{{phone}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Queue",
+      "item": [
+        {
+          "name": "POST create ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"triageId\": \"{{triageId}}\",\n  \"unitId\": {{unitId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ticket by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/tickets/566d5a7b-d139-4f34-87b7-feca2363a99c",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "tickets",
+                "566d5a7b-d139-4f34-87b7-feca2363a99c"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST checkin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/tickets/0e8f7663-8160-4bdf-82c8-80b231cc2d58/checkin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "tickets",
+                "0e8f7663-8160-4bdf-82c8-80b231cc2d58",
+                "checkin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST call",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/tickets/566d5a7b-d139-4f34-87b7-feca2363a99c/call",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "tickets",
+                "566d5a7b-d139-4f34-87b7-feca2363a99c",
+                "call"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST finish (DONE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outcome\": \"DONE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/tickets/566d5a7b-d139-4f34-87b7-feca2363a99c/finish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "tickets",
+                "566d5a7b-d139-4f34-87b7-feca2363a99c",
+                "finish"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST finish (NO_SHOW)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outcome\": \"NO_SHOW\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/tickets/566d5a7b-d139-4f34-87b7-feca2363a99c/finish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "tickets",
+                "566d5a7b-d139-4f34-87b7-feca2363a99c",
+                "finish"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET list by unit + status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/units/1/tickets?status=CHECKED_IN",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "units",
+                "1",
+                "tickets"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CHECKED_IN"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET panel (waiting + checkedIn + called)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/units/1/panel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "units",
+                "1",
+                "panel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET metrics (today)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/queue/units/1/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "queue",
+                "units",
+                "1",
+                "metrics"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET metrics (date)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://jcnz1v5vd4.execute-api.us-east-1.amazonaws.com/prod/api/queue/units/1/metrics?date=2026-04-07",
+              "protocol": "https",
+              "host": [
+                "jcnz1v5vd4",
+                "execute-api",
+                "us-east-1",
+                "amazonaws",
+                "com"
+              ],
+              "path": [
+                "prod",
+                "api",
+                "queue",
+                "units",
+                "1",
+                "metrics"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-04-07"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "unitId",
+      "value": "1"
+    },
+    {
+      "key": "patientId",
+      "value": ""
+    },
+    {
+      "key": "triageId",
+      "value": ""
+    },
+    {
+      "key": "ticketId",
+      "value": ""
+    },
+    {
+      "key": "phone",
+      "value": "11999999999"
+    }
+  ]
+}
